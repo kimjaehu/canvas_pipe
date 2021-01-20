@@ -1,3 +1,5 @@
+import { Drop } from "./drop.js";
+
 class App {
   constructor() {
     this.canvas = document.createElement("canvas");
@@ -5,6 +7,8 @@ class App {
     document.body.appendChild(this.canvas);
 
     this.pixelRatio = window.devicePixelRatio > 1 ? 2 : 1;
+
+    this.drop = new Drop();
 
     window.addEventListener("resize", this.resize.bind(this), false);
     this.resize();
@@ -14,6 +18,10 @@ class App {
     // document.addEventListener("pointerdown", this.onDown.bind(this), false);
     // document.addEventListener("pointermove", this.onMove.bind(this), false);
     // document.addEventListener("pointerup", this.onUp.bind(this), false);
+
+    this.width = 10;
+    this.pixelSize = 30;
+    this.pixels = [];
 
     this.isLoaded = false;
 
@@ -34,6 +42,8 @@ class App {
 
     this.ctx.scale(this.pixelRatio, this.pixelRatio);
 
+    this.drop.resize(this.stageWidth, this.stageHeight);
+
     if (this.isLoaded) {
       this.drawImage();
     }
@@ -42,6 +52,7 @@ class App {
   }
 
   animate(t) {
+    this.drop.animate(this.ctx);
     requestAnimationFrame(this.animate.bind(this));
     // this.ctx.clearRect(0, 0, this.stageWidth, this.stageHeight);
   }
@@ -60,7 +71,18 @@ class App {
 
     this.imgData = this.ctx.getImageData(imgPosX, imgPosY, imgWidth, imgHeight);
     // this.ctx.clearRect(0, 0, this.stageWidth, this.stageHeight);
-    console.log(this.imgData);
+    drowPixels(imgPosX, imgPosY, imgWidth, imgHeight);
+  }
+
+  drawPixels(imgWidth, imgHeight) {
+    this.pixels = [];
+
+    this.columns = Math.ceil(imgWidth / this.pixelSize);
+    this.rows = Math.ceil(imgHeight / this.pixelSize);
+
+    for (let i = 0; this.rows; i++) {
+      const y = i * this.pixelSize;
+    }
   }
 }
 

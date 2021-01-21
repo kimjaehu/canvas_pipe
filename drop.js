@@ -12,14 +12,12 @@ export class Drop {
   }
 
   animate(ctx) {
-    console.log(this.y, this.stageHeight);
-    if (this.y < this.stageHeight) {
-      this.y += this.speed;
-    }
-
-    ctx.beginPath();
-    ctx.fillStyle = "#00ff00";
-    ctx.arc(this.x, this.y, this.radius, Math.PI * 2, false);
-    ctx.fill();
+    // if (this.y < this.stageHeight) {
+    //   this.y += this.speed;
+    // }
+    // ctx.beginPath();
+    // ctx.fillStyle = "#00ff00";
+    // ctx.arc(this.x, this.y, this.radius, Math.PI * 2, false);
+    // ctx.fill();
   }
 }

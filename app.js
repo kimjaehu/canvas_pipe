@@ -22,7 +22,7 @@ class App {
     // document.addEventListener("pointerup", this.onUp.bind(this), false);
 
     this.width = 10;
-    this.pixelSize = 50;
+    this.pixelSize = 10;
     this.pixels = [];
 
     this.isLoaded = false;
@@ -66,13 +66,18 @@ class App {
     const stageRatio = this.stageWidth / this.stageHeight;
     const imgRatio = this.image.width / this.image.height;
 
+    console.log(this.imgPos.width, this.imgPos.height);
+
     if (stageRatio < 1) {
-      this.imgPos.width = this.stageWidth / 1.5;
-      this.imgPos.height = this.imgPos.width * imgRatio;
+      this.imgPos.width = this.stageWidth / 2;
+      this.imgPos.height = this.imgPos.width / imgRatio;
     } else {
       this.imgPos.width = this.stageWidth / 3;
-      this.imgPos.height = this.imgPos.width * imgRatio;
+      this.imgPos.height = this.imgPos.width / imgRatio;
     }
+
+    this.imgPos.x = (this.stageWidth - this.imgPos.width) / 2;
+    this.imgPos.y = (this.stageHeight - this.imgPos.height) / 2;
 
     this.ctx.drawImage(
       this.image,
@@ -106,7 +111,7 @@ class App {
       this.stageWidth,
       this.stageHeight
     );
-    // this.ctx.clearRect(0, 0, this.stageWidth, this.stageHeight);
+
     this.drawPixels();
   }
 
@@ -128,8 +133,9 @@ class App {
         const red = this.imgData.data[pixelIndex + 0];
         const green = this.imgData.data[pixelIndex + 1];
         const blue = this.imgData.data[pixelIndex + 2];
+        const alpha = this.imgData.data[pixelIndex + 3];
 
-        const pixel = new Pixel(x, y, this.pixelSize, red, green, blue);
+        const pixel = new Pixel(x, y, this.pixelSize, red, green, blue, alpha);
 
         this.pixels.push(pixel);
       }
@@ -138,29 +144,16 @@ class App {
 
   animate(t) {
     window.requestAnimationFrame(this.animate.bind(this));
-
-    // for (let i = 0; i < this.pixels.length; i++) {
-    //   const pixel = this.pixels[i];
-
-    //   pixel.animate(this.ctx);
-    // }
+    // this.ctx.clearRect(0, 0, this.stageWidth, this.stageHeight);
   }
 
   onClick(e) {
     this.ctx.clearRect(0, 0, this.stageWidth, this.stageHeight);
-
-    this.ctx.drawImage(
-      this.image,
-      0,
-      0,
-      this.image.width,
-      this.image.height,
-
-      this.imgPos.x,
-      this.imgPos.y,
-      this.imgPos.width,
-      this.imgPos.height
-    );
+    for (let i = 0; i < this.pixels.length; i++) {
+      const pixel = this.pixels[i];
+      console.log(pixel);
+      pixel.animate(this.ctx);
+    }
   }
 }
 

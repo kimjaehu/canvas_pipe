@@ -1,6 +1,3 @@
-import { Drop } from "./drop.js";
-import { Pixel } from "./pixel.js";
-
 class App {
   constructor() {
     this.canvas = document.createElement("canvas");
@@ -12,18 +9,15 @@ class App {
 
     this.pixelRatio = window.devicePixelRatio > 1 ? 2 : 1;
 
-    this.drop = new Drop();
-
     window.addEventListener("resize", this.resize.bind(this), false);
     this.resize();
 
     // document.addEventListener("pointerdown", this.onDown.bind(this), false);
     // document.addEventListener("pointermove", this.onMove.bind(this), false);
     // document.addEventListener("pointerup", this.onUp.bind(this), false);
+    this.cards = [];
 
-    this.width = 10;
-    this.pixelSize = 10;
-    this.pixels = [];
+    this.cardSize = 30;
 
     this.isLoaded = false;
     this.imgPos = {
@@ -34,7 +28,7 @@ class App {
     };
 
     this.image = new Image();
-    this.image.src = "this_is_not_a_pipe.png";
+    this.image.src = "this_is_not_a_pipe_bg.png";
     this.image.onload = () => {
       this.isLoaded = true;
       this.drawImage();
@@ -50,14 +44,10 @@ class App {
 
     this.ctx.scale(this.pixelRatio, this.pixelRatio);
 
-    this.tmpCanvas.width = this.stageWidth;
-    this.tmpCanvas.height = this.stageHeight;
-
-    this.drop.resize(this.stageWidth, this.stageHeight);
-
     if (this.isLoaded) {
       this.drawImage();
     }
+
     window.requestAnimationFrame(this.animate.bind(this));
     this.canvas.addEventListener("click", this.onClick.bind(this), false);
   }
@@ -66,18 +56,21 @@ class App {
     const stageRatio = this.stageWidth / this.stageHeight;
     const imgRatio = this.image.width / this.image.height;
 
-    console.log(this.imgPos.width, this.imgPos.height);
+    this.imgPos.width = this.stageWidth;
+    this.imgPos.height = this.stageHeight;
 
-    if (stageRatio < 1) {
-      this.imgPos.width = this.stageWidth / 2;
-      this.imgPos.height = this.imgPos.width / imgRatio;
+    if (imgRatio > stageRatio) {
+      this.imgPos.width = Math.round(
+        this.image.width * (this.stageHeight / this.image.height)
+      );
+      this.imgPos.x = Math.round((this.stageWidth - this.imgPos.width) / 2);
     } else {
-      this.imgPos.width = this.stageWidth / 3;
-      this.imgPos.height = this.imgPos.width / imgRatio;
-    }
+      this.imgPos.height = Math.round(
+        this.image.height * (this.stageWidth / this.image.width)
+      );
 
-    this.imgPos.x = (this.stageWidth - this.imgPos.width) / 2;
-    this.imgPos.y = (this.stageHeight - this.imgPos.height) / 2;
+      this.imgPos.y = Math.round((this.stageHeight - this.imgPos.height) / 2);
+    }
 
     this.ctx.drawImage(
       this.image,
@@ -91,69 +84,21 @@ class App {
       this.imgPos.width,
       this.imgPos.height
     );
-
-    this.tmpCtx.drawImage(
-      this.image,
-      0,
-      0,
-      this.image.width,
-      this.image.height,
-
-      this.imgPos.x,
-      this.imgPos.y,
-      this.imgPos.width,
-      this.imgPos.height
-    );
-
-    this.imgData = this.tmpCtx.getImageData(
-      0,
-      0,
-      this.stageWidth,
-      this.stageHeight
-    );
-
-    this.drawPixels();
   }
 
-  drawPixels() {
-    this.pixels = [];
+  getCardPositions() {
+    this.cards = [];
 
     this.columns = Math.ceil(this.stageWidth / this.pixelSize);
     this.rows = Math.ceil(this.stageHeight / this.pixelSize);
-
-    for (let i = 0; i < this.rows; i++) {
-      const y = (i + 0.5) * this.pixelSize;
-      const pixelY = Math.max(Math.min(y, this.stageHeight), 0);
-
-      for (let j = 0; j < this.columns; j++) {
-        const x = (j + 0.5) * this.pixelSize;
-        const pixelX = Math.max(Math.min(x, this.stageWidth), 0);
-
-        const pixelIndex = (pixelX + pixelY * this.stageWidth) * 4;
-        const red = this.imgData.data[pixelIndex + 0];
-        const green = this.imgData.data[pixelIndex + 1];
-        const blue = this.imgData.data[pixelIndex + 2];
-        const alpha = this.imgData.data[pixelIndex + 3];
-
-        const pixel = new Pixel(x, y, this.pixelSize, red, green, blue, alpha);
-
-        this.pixels.push(pixel);
-      }
-    }
   }
 
   animate(t) {
-    window.requestAnimationFrame(this.animate.bind(this));
-    // this.ctx.clearRect(0, 0, this.stageWidth, this.stageHeight);
+    // window.requestAnimationFrame(this.animate.bind(this));
   }
 
   onClick(e) {
-    this.ctx.clearRect(0, 0, this.stageWidth, this.stageHeight);
-    for (let i = 0; i < this.pixels.length; i++) {
-      const pixel = this.pixels[i];
-      console.log(pixel);
-      pixel.animate(this.ctx);
-    }
+    window.requestAnimationFrame(this.animate.bind(this));
   }
 }
 

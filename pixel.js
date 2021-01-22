@@ -11,8 +11,7 @@ export class Pixel {
     this.alpha = alpha;
   }
 
-  animate(ctx) {
-    console.log(this.x, this.y, this.pixelSize, this.pixelSize);
+  draw(ctx) {
     ctx.beginPath();
     ctx.fillStyle =
       "rgba(" +

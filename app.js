@@ -1,3 +1,5 @@
+import { Card } from "./card.js";
+
 class App {
   constructor() {
     this.canvas = document.createElement("canvas");
@@ -9,6 +11,8 @@ class App {
 
     this.pixelRatio = window.devicePixelRatio > 1 ? 2 : 1;
 
+    this.card = new Card();
+
     window.addEventListener("resize", this.resize.bind(this), false);
     this.resize();
 
@@ -17,7 +21,7 @@ class App {
     // document.addEventListener("pointerup", this.onUp.bind(this), false);
     this.cards = [];
 
-    this.cardSize = 30;
+    this.cardSize = 100;
 
     this.isLoaded = false;
     this.imgPos = {
@@ -84,17 +88,60 @@ class App {
       this.imgPos.width,
       this.imgPos.height
     );
+
+    this.tmpCtx.drawImage(
+      this.image,
+      0,
+      0,
+      this.image.width,
+      this.image.height,
+
+      this.imgPos.x,
+      this.imgPos.y,
+      this.imgPos.width,
+      this.imgPos.height
+    );
+
+    this.imgData = this.tmpCtx.getImageData(
+      0,
+      0,
+      this.stageWidth,
+      this.stageHeight
+    );
+
+    this.drawCards();
   }
 
-  getCardPositions() {
-    this.cards = [];
+  drawCards() {
+    this.points = [];
 
-    this.columns = Math.ceil(this.stageWidth / this.pixelSize);
-    this.rows = Math.ceil(this.stageHeight / this.pixelSize);
+    this.columns = Math.ceil(this.stageWidth / this.cardSize);
+    this.rows = Math.ceil(this.stageHeight / this.cardSize);
+
+    // ctx.drawImage(image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight);
+
+    for (let i = 0; i < this.rows; i++) {
+      const y = i * this.cardSize;
+      const pixelY = Math.max(Math.min(y, this.stageHeight), 0);
+
+      for (let j = 0; j < this.columns; j++) {
+        const x = j * this.cardSize;
+        const pixelX = Math.max(Math.min(x, this.stageWidth), 0);
+
+        const card = new Card(this.image, pixelX, pixelY, this.cardSize);
+
+        this.cards.push(card);
+      }
+    }
   }
 
   animate(t) {
-    // window.requestAnimationFrame(this.animate.bind(this));
+    this.ctx.clearRect(0, 0, this.stageWidth, this.stageHeight);
+    if (this.isLoaded) {
+      this.drawImage();
+    }
+    window.requestAnimationFrame(this.animate.bind(this));
+    this.cards.length > 0 && this.cards[0].animate(this.tmpCtx);
   }
 
   onClick(e) {

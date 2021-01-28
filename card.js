@@ -1,5 +1,5 @@
 export class Card {
-  constructor(img, x, y, cardSize) {
+  constructor(img, x, y, cardSize, speed) {
     this.img = img;
     this.x = x;
     this.y = y;
@@ -7,34 +7,47 @@ export class Card {
     this.py = y;
     this.cardSize = cardSize;
 
-    this.speed = 0;
-    this.gravity = 0.098;
+    this.scale = 0;
+    this.speed = speed;
+    this.gravity = 0.01;
     this.gravitySpeed = 0;
   }
 
   animate(ctx) {
-    this.gravity = 0.098;
+    // this.gravity = 0.098;
+    ctx.save();
+    // ctx.beginPath();
 
-    ctx.beginPath();
-    // ctx.fillStyle = "#000000";
+    ctx.fillStyle = "#000000";
     // ctx.strokeStyle = "#ffffff";
-    // ctx.fillRect(this.x, this.y, this.cardSize, this.cardSize);
-    // ctx.strokeRect(this.x, this.y, this.cardSize, this.cardSize);
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    console.log(this.cardSize);
+    ctx.arc(this.x, this.y, this.cardSize, 0, Math.PI * 2, false);
 
-    ctx.drawImage(
-      this.img,
-      this.x,
-      this.y,
-      this.cardSize,
-      this.cardSize,
-      this.x,
-      this.y,
-      this.cardSize,
-      this.cardSize
-    );
+    ctx.scale(this.scale, this.scale);
+
+    // ctx.clip();
+
+    // ctx.drawImage(
+    //   this.img,
+    //   this.x,
+    //   this.y,
+    //   this.cardSize,
+    //   this.cardSize,
+    //   this.x,
+    //   this.y,
+    //   this.cardSize,
+    //   this.cardSize
+    // );
+
     ctx.fill();
-    this.gravitySpeed += this.gravity;
-    this.y += this.speed + this.gravitySpeed;
+
+    ctx.restore();
+
+    this.scale += 0.1;
+
+    // this.gravitySpeed += this.gravity;
+    // this.y += this.speed + this.gravitySpeed;
     return this.y;
   }
 

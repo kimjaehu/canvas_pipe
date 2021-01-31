@@ -1,4 +1,5 @@
-import { Dot } from "./dot.js";
+import { Card } from "./card.js";
+import { Logo } from "./logo.js";
 
 class App {
   constructor() {
@@ -14,36 +15,24 @@ class App {
     this.background.src = "./this_is_not_a_pipe_bg.png";
     document.body.appendChild(this.background);
 
-    this.video = document.createElement("video");
-    this.video.className = "video";
-    this.video.src = "running.mp4";
-    this.video.controls = true;
-    this.video.autoplay = true;
-    this.video.loop = true;
-    this.video.muted = true;
-    this.video.height = 1280;
-    this.video.width = 720;
-
-    document.body.appendChild(this.video);
-
     this.pixelRatio = window.devicePixelRatio > 1 ? 2 : 1;
+
+    this.logo = new Logo();
 
     window.addEventListener("resize", this.resize.bind(this), false);
     this.resize();
 
-    // document.addEventListener("pointerdown", this.onDown.bind(this), false);
-    // document.addEventListener("pointermove", this.onMove.bind(this), false);
-    // document.addEventListener("pointerup", this.onUp.bind(this), false);
+    document.addEventListener("pointerdown", this.onDown.bind(this), false);
+    document.addEventListener("pointermove", this.onMove.bind(this), false);
+    document.addEventListener("pointerup", this.onUp.bind(this), false);
 
-    this.radius = 10;
-    this.pixelSize = 30;
-    this.dots = [];
-
+    this.cards = [];
+    this.cardSize = 75;
+    this.imageNum = 0;
     this.cur = 0;
 
     this.isLoaded = false;
-    this.videoLoaded = false;
-
+    this.isPressed = false;
     this.imgPos = {
       x: 0,
       y: 0,
@@ -51,15 +40,16 @@ class App {
       height: 0,
     };
 
-    this.videoElem = document.querySelector(".video");
-    this.videoElem.addEventListener("canplaythrough", this.animate.bind(this));
+    // this.images = [];
+    // for (var i = 0; i <= 8; i++) {
+    //
+    // }
 
-    // this.image = new Image();
-    // this.image.onload = () => {
-    //   this.isLoaded = true;
-    //   // this.getCards();
-    // };
-    // this.image.src = "starry_night_full.jpg";
+    this.image = new Image();
+    this.image.onload = () => {
+      this.isLoaded = true;
+      this.drawImage();
+    };
   }
 
   resize() {
@@ -71,49 +61,40 @@ class App {
 
     this.ctx.scale(this.pixelRatio, this.pixelRatio);
 
+    if (this.isLoaded) {
+      this.drawImage();
+    }
+    this.ctx.clearRect(0, 0, this.stageWidth, this.stageHeight);
     window.requestAnimationFrame(this.animate.bind(this));
     // this.canvas.addEventListener("click", this.onClick.bind(this), false);
   }
 
   drawImage() {
     const stageRatio = this.stageWidth / this.stageHeight;
-    const imgRatio = this.videoElem.width / this.videoElem.height;
+    const imgRatio = this.image.width / this.image.height;
 
     this.imgPos.width = this.stageWidth;
     this.imgPos.height = this.stageHeight;
 
     if (imgRatio > stageRatio) {
       this.imgPos.width = Math.round(
-        this.videoElem.width * (this.stageHeight / this.videoElem.height)
+        this.image.width * (this.stageHeight / this.image.height)
       );
       this.imgPos.x = Math.round((this.stageWidth - this.imgPos.width) / 2);
     } else {
       this.imgPos.height = Math.round(
-        this.videoElem.height * (this.stageWidth / this.videoElem.width)
+        this.image.height * (this.stageWidth / this.image.width)
       );
 
       this.imgPos.y = Math.round((this.stageHeight - this.imgPos.height) / 2);
     }
 
-    // this.ctx.drawImage(
-    //   this.videoElem,
-    //   0,
-    //   0,
-    //   this.videoElem.width,
-    //   this.videoElem.height,
-
-    //   this.imgPos.x,
-    //   this.imgPos.y,
-    //   this.imgPos.width,
-    //   this.imgPos.height
-    // );
-
-    this.tmpCtx.drawImage(
-      this.videoElem,
+    this.ctx.drawImage(
+      this.image,
       0,
       0,
-      this.videoElem.width,
-      this.videoElem.height,
+      this.image.width,
+      this.image.height,
 
       this.imgPos.x,
       this.imgPos.y,
@@ -121,62 +102,72 @@ class App {
       this.imgPos.height
     );
 
-    this.imgData = this.tmpCtx.getImageData(
+    this.imgData = this.ctx.getImageData(
       0,
       0,
       this.stageWidth,
       this.stageHeight
     );
 
-    this.drawDots();
+    this.getCards();
   }
 
-  drawDots() {
-    this.dots = [];
-    this.columns = Math.ceil(this.stageWidth / this.pixelSize);
-    this.rows = Math.ceil(this.stageHeight / this.pixelSize);
+  getCards() {
+    this.cards = [];
+
+    this.columns = Math.ceil(this.stageWidth / this.cardSize);
+    this.rows = Math.ceil(this.stageHeight / this.cardSize);
 
     for (let i = 0; i < this.rows; i++) {
-      const y = (i + 0.5) * this.pixelSize;
+      const y = i * this.cardSize;
       const pixelY = Math.max(Math.min(y, this.stageHeight), 0);
 
       for (let j = 0; j < this.columns; j++) {
-        const x = (j + 0.5) * this.pixelSize;
+        const x = j * this.cardSize;
         const pixelX = Math.max(Math.min(x, this.stageWidth), 0);
+
+        const size = Math.floor(Math.random() * this.cardSize + this.cardSize);
 
         const pixelIndex = (pixelX + pixelY * this.stageWidth) * 4;
         const red = this.imgData.data[pixelIndex + 0];
         const green = this.imgData.data[pixelIndex + 1];
         const blue = this.imgData.data[pixelIndex + 2];
+        const alpha = this.imgData.data[pixelIndex + 3];
 
-        const dot = new Dot(
-          x,
-          y,
-          this.radius,
-          this.pixelSize,
-          red,
-          green,
-          blue
-        );
-
-        this.dots.push(dot);
+        const card = new Card(x, y, size, red, green, blue, alpha);
+        this.cards.push(card);
       }
     }
   }
 
   animate(t) {
     window.requestAnimationFrame(this.animate.bind(this));
-    this.drawImage();
-    for (let i = 0; i < this.dots.length; i++) {
-      const dot = this.dots[i];
+    if (this.isPressed) {
+      if (this.cards.length > 0) {
+        let randomCard = Math.floor(Math.random() * this.cards.length);
 
-      dot.animate(this.ctx);
+        const card = this.cards[randomCard];
+        card.animate(this.ctx);
+        this.logo.draw(this.ctx, this.stageWidth, this.stageHeight, card);
+      }
+    } else {
+      this.ctx.clearRect(0, 0, this.stageWidth, this.stageHeight);
+      this.logo.standBy(this.ctx, this.stageWidth, this.stageHeight);
     }
   }
 
-  onClick(e) {
-    // window.requestAnimationFrame(this.animate.bind(this));
-    // this.cards.push(new Card(this.image, e.offsetX, e.offsetY, 1));
+  onDown(e) {
+    this.isPressed = true;
+    this.image.src = `image_${this.imageNum}.jpg`;
+    this.imageNum++;
+    if (this.imageNum > 8) {
+      this.imageNum = 0;
+    }
+  }
+  onMove(e) {}
+  onUp(e) {
+    this.isPressed = false;
+    this.ctx.clearRect(0, 0, this.stageWidth, this.stageHeight);
   }
 }
 

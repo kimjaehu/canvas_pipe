@@ -160,7 +160,7 @@ class App {
     this.isPressed = true;
     this.image.src = `image_${this.imageNum}.jpg`;
     this.imageNum++;
-    if (this.imageNum > 8) {
+    if (this.imageNum > 6) {
       this.imageNum = 0;
     }
   }

@@ -29,7 +29,7 @@ export class Logo {
   }
 
   standBy(ctx, stageWidth, stageHeight) {
-    this.alpha < 0.4 ? (this.alpha += this.speed) : (this.alpha = 0);
+    this.alpha < 0.3 ? (this.alpha += this.speed) : (this.alpha = 0);
     ctx.save();
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.fillStyle = `rgba(255,255,255,${this.alpha})`;

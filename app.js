@@ -64,6 +64,8 @@ class App {
     if (this.isLoaded) {
       this.drawImage();
     }
+
+    this.logo.resize(this.canvas.width, this.canvas.height);
     this.ctx.clearRect(0, 0, this.stageWidth, this.stageHeight);
     window.requestAnimationFrame(this.animate.bind(this));
     // this.canvas.addEventListener("click", this.onClick.bind(this), false);
@@ -119,7 +121,7 @@ class App {
     this.rows = Math.ceil(this.stageHeight / this.cardSize);
 
     for (let i = 0; i < this.rows; i++) {
-      const y = i * this.cardSize;
+      const y = i * this.cardSize + this.cardSize;
       const pixelY = Math.max(Math.min(y, this.stageHeight), 0);
 
       for (let j = 0; j < this.columns; j++) {
@@ -148,11 +150,11 @@ class App {
 
         const card = this.cards[randomCard];
         card.animate(this.ctx);
-        this.logo.draw(this.ctx, this.stageWidth, this.stageHeight, card);
+        this.logo.draw(this.ctx, card);
       }
     } else {
       this.ctx.clearRect(0, 0, this.stageWidth, this.stageHeight);
-      this.logo.standBy(this.ctx, this.stageWidth, this.stageHeight);
+      this.logo.standBy(this.ctx);
     }
   }
 

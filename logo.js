@@ -9,7 +9,12 @@ export class Logo {
     this.speed = 0.001;
   }
 
-  draw(ctx, stageWidth, stageHeight, card) {
+  resize(stageWidth, stageHeight) {
+    this.stageWidth = stageWidth;
+    this.stageHeight = stageHeight;
+  }
+
+  draw(ctx, card) {
     this.alpha < 1 && (this.alpha += 0.001);
     this.alpha > 1 && (this.alpha = 1);
     ctx.save();
@@ -17,24 +22,26 @@ export class Logo {
     ctx.fillStyle = `rgba(255,255,255,${this.alpha})`;
     ctx.shadowColor = `rgb(${card.red},${card.green},${card.blue})`;
     ctx.strokeStyle = `rgb(${card.red},${card.green},${card.blue})`;
-    ctx.translate(stageWidth / 2 - 200, stageHeight / 2 - this.fontSize - 100);
-    ctx.scale(6, 6);
+    ctx.translate(this.stageWidth * 0.5 - 300, this.stageHeight * 0.5 - 200);
+    ctx.scale(this.stageWidth * 0.004, this.stageWidth * 0.004);
     ctx.fill(this.logo);
 
+    
+    // ctx.setTransform(1, 0, 0, 1, 0, 0);
+    // ctx.fillStyle = `rgba(255,255,255,${this.alpha})`;
+    // ctx.font = `${this.fontSize}px 'Nunito Sans', sans-serif`;
+    // ctx.textAlign = "center";
+    // ctx.fillText(this.text, this.stageWidth * 0.5, this.stageHeight * 0.5);
     ctx.restore();
-    ctx.fillStyle = `rgba(255,255,255,${this.alpha})`;
-    ctx.font = `${this.fontSize}px 'Nunito Sans', sans-serif`;
-    ctx.textAlign = "center";
-    ctx.fillText(this.text, stageWidth / 2, stageHeight / 2 + 100);
   }
 
-  standBy(ctx, stageWidth, stageHeight) {
+  standBy(ctx) {
     this.alpha < 0.3 ? (this.alpha += this.speed) : (this.alpha = 0);
     ctx.save();
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.fillStyle = `rgba(255,255,255,${this.alpha})`;
-    ctx.translate(stageWidth / 2 - 200, stageHeight / 2 - this.fontSize - 100);
-    ctx.scale(6, 6);
+    ctx.translate(this.stageWidth * 0.5 - 300, this.stageHeight * 0.5 - 200);
+    ctx.scale(this.stageWidth * 0.004, this.stageWidth * 0.004);
     ctx.fill(this.logo);
     ctx.restore();
   }
